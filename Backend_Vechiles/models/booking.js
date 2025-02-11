@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema(
   {
-    
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User', // Reference to the User model
@@ -11,6 +10,7 @@ const bookingSchema = new mongoose.Schema(
     bookingDate: {
       type: Date,
       default: Date.now,
+      required: true,
     },
     vehicle: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +19,7 @@ const bookingSchema = new mongoose.Schema(
     },
     vehicleLicense: {
       type: String,
-      required: true, // License plate number of the vehicle
+      required: true,
     },
     totalAmount: {
       type: Number,
@@ -28,8 +28,10 @@ const bookingSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ['Pending', 'Confirmed'],
-      default: 'Confirmed', // Directly set the default status to 'Confirmed'
+      default: 'Confirmed',
     },
   },
-  { timestamps: true } // Automatically adds createdAt and updatedAt
+  { timestamps: true } // Automatically adds createdAt and updatedAt fields
 );
+
+module.exports = mongoose.model('Booking', bookingSchema);

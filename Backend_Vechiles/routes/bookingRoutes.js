@@ -1,34 +1,50 @@
 const express = require('express');
-const { createBooking, getBookings } = require('../controllers/bookingController'); // Controller functions
+const router = express.Router();
+const Booking = require('../models/booking'); // Import booking model
 const authMiddleware = require('../middleware/authMiddleware'); // Authentication middleware
 
-const router = express.Router();
-
-// POST: Create a new booking (Protected route)
-router.post('/book', authMiddleware, async (req, res) => {
+// Create Booking
+router.post('/', authMiddleware, async (req, res) => {
   try {
-    const bookingData = req.body;
+    const { vehicles, bookingDate, totalAmount } = req.body;
 
-    // Use the controller to create a booking
-    const booking = await createBooking({ userId: req.user.id, ...bookingData });
-    return res.status(201).json({ message: 'Booking created successfully', booking });
+    if (!vehicles || vehicles.length === 0) {
+      return res.status(400).json({ error: 'At least one vehicle is required' });
+    }
+
+    // Extract first vehicle (assuming only one for now)
+    const { vehicleId } = vehicles[0];
+
+    const newBooking = new Booking({
+      user: req.user.id,
+      vehicle: vehicleId,
+      bookingDate,
+      vehicleLicense: req.body.vehicleLicense,
+      totalAmount,
+    });
+
+    const savedBooking = await newBooking.save();
+
+    res.status(201).json({ message: 'Booking created successfully', booking: savedBooking });
   } catch (error) {
     console.error('Error creating booking:', error);
-    return res.status(500).json({ error: 'Failed to create booking. Please try again.' });
+    res.status(500).json({ error: 'Failed to create booking. Please try again.' });
   }
 });
 
-// GET: Fetch all bookings for the authenticated user (Protected route)
+// Get User Bookings
 router.get('/bookings', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const bookings = await Booking.find({ user: req.user.id }).populate('vehicle');
 
-    // Use the controller to fetch bookings
-    const bookings = await getBookings(userId);
-    return res.status(200).json({ message: 'Bookings fetched successfully', bookings });
+    if (!bookings || bookings.length === 0) {
+      return res.status(404).json({ message: 'No bookings found' });
+    }
+
+    res.status(200).json({ message: 'Bookings fetched successfully', bookings });
   } catch (error) {
     console.error('Error fetching bookings:', error);
-    return res.status(500).json({ error: 'Failed to fetch bookings. Please try again.' });
+    res.status(500).json({ error: 'Failed to fetch bookings. Please try again.' });
   }
 });
 

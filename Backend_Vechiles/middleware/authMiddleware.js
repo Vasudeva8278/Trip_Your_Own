@@ -1,19 +1,31 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user'); // Assuming you have a User model
+const User = require('../models/user'); // Import User model
+const dotenv = require('dotenv');
 
-const authMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Get the token from headers
+dotenv.config(); // Ensure env variables are loaded
 
-  if (!token) {
-    return res.status(401).json({ error: 'Authentication token required' });
-  }
-
+const authMiddleware = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the token
-    req.user = decoded; // Attach the user to the request object
-    next(); // Proceed to the next middleware or route handler
+    const token = req.header('Authorization');
+
+    if (!token) {
+      return res.status(401).json({ error: 'Access denied. No token provided.' });
+    }
+
+    // Verify Token
+    const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET);
+    
+    // Check if user exists
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    req.user = user; // Attach user to request
+    next();
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid or expired token' });
+    console.error('Authentication error:', error);
+    return res.status(401).json({ error: 'Invalid token. Authentication failed.' });
   }
 };
 

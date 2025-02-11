@@ -3,7 +3,7 @@ const router = express.Router();
 const Hotel = require('../models/hotel'); // Assuming you are using the Hotel model
 
 // POST route to add a new hotel
-router.post('/add', async (req, res) => {
+router.post('/post', async (req, res) => {
   try {
     const { name, photourl, per_day, rating } = req.body;
 

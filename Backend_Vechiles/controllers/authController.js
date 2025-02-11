@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 // Register a new user
+
 const registerUser = async (req, res) => {
   const { username, password } = req.body;
 

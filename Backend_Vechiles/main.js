@@ -10,6 +10,7 @@ const hotel = require('./routes/hotels');
 const spot = require('./routes/spots');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes'); // Import user routes
+const message = require('./routes/meassageRoute');
 
 connectDB();
 const app = express();
@@ -38,6 +39,7 @@ const connectToDatabase = async () => {
 connectToDatabase();
 
 // Register routes
+app.use('/message',message);
 app.use('/api/user', userRoutes); // User-related routes (handles profile, orders, notifications, etc.)
 app.use('/spot', spot); // Spot routes
 app.use('/vehicles', vehicleRoutes); // Vehicle routes for adding/getting vehicles

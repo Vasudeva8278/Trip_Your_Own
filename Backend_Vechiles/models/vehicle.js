@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-// Define the schema
-const vehicleSchema = new mongoose.Schema({
+
+const VehicleSchema = new mongoose.Schema({
   name: {
-    type: String,
+    type: String, // Corrected type from 'string' to 'String'
     required: true,
     trim: true,
   },
@@ -11,21 +11,26 @@ const vehicleSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  vehicle_number: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  price_of_rent_per_day: {
+  number:{
+    type:String,
+    required:true,
+},
+  per_day: {
     type: Number,
     required: true,
     min: 0,
+  },
+  rating: {
+    type: Number, // Assuming the rating is a number (e.g., 1 to 5)
+    required: true,
+    min: 0, // Optional: Add a min value for the rating, like 0 or 1
+    max: 5, // Optional: Add a max value for the rating, like 5
   },
 }, {
   timestamps: true, // Adds createdAt and updatedAt timestamps
 });
 
-// Create the model
-const Vehicle = mongoose.model('Vehicle', vehicleSchema);
+// Create the model from the schema
+const Vehicle = mongoose.model('Vehicle', VehicleSchema); // Corrected model name to 'Hotel'
 
-module.exports = Vehicle;
+module.exports = Vehicle; // Export the Hotel model
